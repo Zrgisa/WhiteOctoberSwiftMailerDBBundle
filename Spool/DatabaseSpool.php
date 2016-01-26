@@ -35,9 +35,9 @@ class DatabaseSpool extends \Swift_ConfigurableSpool
 
     /**
      * @param RegistryInterface $doc
-     * @param string        $entityClass
-     * @param string        $environment
-     * @param bool          $keepSentMessages
+     * @param string            $entityClass
+     * @param string            $environment
+     * @param bool              $keepSentMessages
      *
      * @throws \InvalidArgumentException
      */
@@ -101,22 +101,17 @@ class DatabaseSpool extends \Swift_ConfigurableSpool
     /**
      * Sends messages using the given transport instance.
      *
-     * @param \Swift_Transport $transport         A transport instance
-     * @param string[]        &$failedRecipients An array of failures by-reference
+     * @param \Swift_Transport $transport A transport instance
+     * @param string[]         &$failedRecipients An array of failures by-reference
      *
      * @return int The number of sent emails
      */
     public function flushQueue(\Swift_Transport $transport, &$failedRecipients = null)
     {
-        if (!$transport->isStarted())
-        {
-            $transport->start();
-        }
-
         $repoClass = $this->doc->getManager()->getRepository($this->entityClass);
-        $limit = $this->getMessageLimit();
-        $limit = $limit > 0 ? $limit : null;
-        $emails = $repoClass->findBy(
+        $limit     = $this->getMessageLimit();
+        $limit     = $limit > 0 ? $limit : null;
+        $emails    = $repoClass->findBy(
             array("status" => EmailInterface::STATUS_READY, "environment" => $this->environment),
             null,
             $limit
@@ -125,23 +120,29 @@ class DatabaseSpool extends \Swift_ConfigurableSpool
             return 0;
         }
 
-        $failedRecipients = (array) $failedRecipients;
-        $count = 0;
-        $time = time();
+        $failedRecipients = (array)$failedRecipients;
+        $count            = 0;
+        $time             = time();
         foreach ($emails as $email) {
             $email->setStatus(EmailInterface::STATUS_PROCESSING);
             $this->doc->getManager()->persist($email);
-            $this->doc->getManager()->flush();
+            $this->doc->getManager()->flush($email);
 
             $message = unserialize($email->getMessage());
+
+            if (!$transport->isStarted()) {
+                $transport->start();
+            }
+
             $count += $transport->send($message, $failedRecipients);
+            $transport->stop();
             if ($this->keepSentMessages === true) {
                 $email->setStatus(EmailInterface::STATUS_COMPLETE);
                 $this->doc->getManager()->persist($email);
             } else {
                 $this->doc->getManager()->remove($email);
             }
-            $this->doc->getManager()->flush();
+            $this->doc->getManager()->flush($email);
 
             if ($this->getTimeLimit() && (time() - $time) >= $this->getTimeLimit()) {
                 break;
