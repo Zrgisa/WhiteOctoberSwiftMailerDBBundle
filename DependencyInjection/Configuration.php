@@ -15,14 +15,13 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root("white_october_swift_mailer_db");
+        $rootNode    = $treeBuilder->root("white_october_swift_mailer_db");
 
         $rootNode
             ->children()
-                ->scalarNode("entity_class")->isRequired()->end()
-                ->scalarNode("keep_sent_messages")->defaultFalse()->end()
-            ->end()
-        ;
+            ->scalarNode("entity_class")->isRequired()->end()
+            ->scalarNode("keep_sent_messages")->defaultFalse()->end()
+            ->end();
 
         return $treeBuilder;
     }

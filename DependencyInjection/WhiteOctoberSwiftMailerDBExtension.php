@@ -13,7 +13,7 @@ class WhiteOctoberSwiftMailerDBExtension extends Extension
     /**
      * Loads any resources/services we need
      *
-     * @param array $configs
+     * @param array                                                   $configs
      * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
      * @return void
      */
@@ -24,19 +24,25 @@ class WhiteOctoberSwiftMailerDBExtension extends Extension
         // Service config
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
+
+        $definition = $container->getParameter('swiftmailer.mailers');
+
+        foreach ((array)$definition as $mailerName => $v) {
+            $container->setAlias('swiftmailer.mailer.'.$mailerName.'.spool.db', 'white_october.swiftmailer_db.spool');
+        }
     }
 
     /**
      * Sets up configuration for the extension
      *
-     * @param array $configs
+     * @param array                                                   $configs
      * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
      */
     protected function setupConfiguration(array $configs, ContainerBuilder $container)
     {
-        $processor = new Processor();
+        $processor     = new Processor();
         $configuration = new Configuration();
-        $config = $processor->processConfiguration($configuration, $configs);
+        $config        = $processor->processConfiguration($configuration, $configs);
 
         $container->setParameter("white_october.swiftmailer_db.spool.entity_class", $config["entity_class"]);
         $container->setParameter("white_october.swiftmailer_db.spool.keep_sent_messages", $config["keep_sent_messages"]);

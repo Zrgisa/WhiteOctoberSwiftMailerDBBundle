@@ -1,5 +1,5 @@
 {
-    "name": "whiteoctober/swiftmailerdbbundle",
+    "name": "zrgisa/swiftmailerdbbundle",
     "description": "Database spooling for SwiftMailer",
     "keywords": ["swiftmailer", "doctrine", "spool"],
     "type": "symfony-bundle",
@@ -8,6 +8,14 @@
         {
             "name": "Rich Sage",
             "email": "rich.sage@gmail.com"
+        },
+        {
+          "name": "Sergej Grivcov",
+          "email": "zrgirox@gmail.com"
+        },
+        {
+          "name": "Miljenko Rebernisak",
+          "email": "miljenko@rebernisak.com"
         }
     ],
     "require": {
