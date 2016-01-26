@@ -93,7 +93,7 @@ class DatabaseSpool extends \Swift_ConfigurableSpool
         $mailObject->setStatus(EmailInterface::STATUS_READY);
         $mailObject->setEnvironment($this->environment);
         $this->doc->getManager()->persist($mailObject);
-        $this->doc->getManager()->flush();
+        $this->doc->getManager()->flush($mailObject);
 
         return true;
     }
